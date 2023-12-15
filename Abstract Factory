@@ -1,0 +1,90 @@
+Призначення
+Подає інтерфейс для утворення родин взаємозв'язаних або взаємозалежних об'єктів, не специфікуючи їхніх конкретних класів.
+
+Застосування
+Слід використовувати шаблон Абстрактна фабрика коли:
+
+система не повинна залежати від того, як утворюються, компонуються та представляються вхідні до неї об'єкти;
+вхідні до родини взаємозв'язані об'єкти повинні використовуватися разом і необхідно забезпечити виконання цього обмеження;
+система повинна конфігуруватися однією з родин складаючих її об'єктів;
+треба подати бібліотеку об'єктів, розкриваючи тільки їхні інтерфейси, але не реалізацію.
+
+#include <string>
+#include <iostream>
+
+using namespace std;
+
+// Сімейство елементів
+// Базовий клас для всіх іграшок
+class Toy
+{
+protected:
+    string name;
+public:
+    Toy(string name)
+    {
+        this->name = name;
+    }
+};
+// Конкретні реалізації
+struct WoodenCat : public Toy
+{
+    WoodenCat() : Toy("Wooden Cat") { cout << this->name << '\n'; }
+};
+struct TeddyCat : public Toy
+{
+    TeddyCat() : Toy("Teddy Cat") { cout << this->name << '\n'; }
+};
+struct WoodenBear : public Toy
+{
+    WoodenBear() : Toy("Wooden Bear") { cout << this->name << '\n'; }
+};
+struct TeddyBear : public Toy
+{
+    TeddyBear() : Toy("Teddy Bear") { cout << this->name << '\n'; }
+};
+// Абстрактна Фабрика (Abstract Factory)
+struct IToyFactory
+{
+    virtual Toy * GetBear() = 0;
+    virtual Toy * GetCat() = 0;
+};
+// конкретна фабрика (concrete factory)
+struct TeddyToysFactory : IToyFactory
+{
+    virtual Toy * GetBear()
+    {
+        return new TeddyBear();
+    }
+    virtual Toy * GetCat()
+    {
+        return new TeddyCat();
+    }
+};
+// і ще одна конкретна фабрика
+struct WoodenToysFactory : IToyFactory
+{
+    virtual Toy * GetBear()
+    {
+        return new WoodenBear();
+    }
+    virtual Toy * GetCat()
+    {
+        return new WoodenCat();
+    }
+};
+// Client
+void create(IToyFactory * toyFactory)
+{
+    Toy * bear = toyFactory->GetBear();
+    Toy * cat = toyFactory->GetCat();
+}
+void main()
+{
+    // Спочатку створимо «дерев'яну» фабрику
+   auto p1 = WoodenToysFactory();
+   auto p2 = TeddyToysFactory();
+    create(&p1);
+    // А тепер створимо «плюшеву» фабрику,
+    create(&p2);
+}
